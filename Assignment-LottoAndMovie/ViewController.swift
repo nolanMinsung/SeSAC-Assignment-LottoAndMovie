@@ -12,7 +12,7 @@ import SnapKit
 class ViewController: UIViewController {
     
     let lottoButton = UIButton(configuration: .tinted())
-    let moviewButton = UIButton(configuration: .tinted())
+    let movieButton = UIButton(configuration: .tinted())
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,23 +22,34 @@ class ViewController: UIViewController {
         lottoButton.configuration?.subtitle = "일확천금을 노리세요?"
         lottoButton.configuration?.titlePadding = 10
         
-        moviewButton.configuration?.image = UIImage(systemName: "movieclapper")
-        moviewButton.configuration?.title = "영화"
-        moviewButton.configuration?.subtitle = "영화 볼 시간이 있어요?"
-        moviewButton.configuration?.titlePadding = 10
+        movieButton.configuration?.image = UIImage(systemName: "movieclapper")
+        movieButton.configuration?.title = "영화"
+        movieButton.configuration?.subtitle = "영화 볼 시간이 있어요?"
+        movieButton.configuration?.titlePadding = 10
         
         view.addSubview(lottoButton)
-        view.addSubview(moviewButton)
+        view.addSubview(movieButton)
         lottoButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(200)
         }
-        moviewButton.snp.makeConstraints { make in
+        movieButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(lottoButton.snp.bottom).offset(100)
         }
+        
+        
+        lottoButton.addTarget(self, action: #selector(presetnLottoVC), for: .touchUpInside)
+        movieButton.addTarget(self, action: #selector(presentMovieRankingVC), for: .touchUpInside)
     }
     
+    @objc private func presetnLottoVC() {
+        present(LottoViewController(), animated: true)
+    }
+    
+    @objc private func presentMovieRankingVC() {
+        present(MovieRankingViewController(), animated: true)
+    }
     
 }
 

@@ -8,22 +8,166 @@
 import UIKit
 
 class LottoViewController: UIViewController {
-
+    
+    private let textField: UITextField = {
+        let textField = UITextField()
+        textField.borderStyle = .roundedRect
+        textField.font = .systemFont(ofSize: 20)
+        textField.textAlignment = .center
+        return textField
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "당첨번호 안내"
+        label.font = .systemFont(ofSize: 15)
+        label.textColor = .black
+        return label
+    }()
+    
+    private let dateLabel: UILabel = {
+       let label = UILabel()
+        label.text = "0000-00-00 추첨"
+        label.textAlignment = .right
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 12)
+        label.textColor = .lightGray
+        return label
+    }()
+    
+    private let separator: UIView = {
+        let view = UIView()
+        view.backgroundColor = .label
+        return view
+    }()
+    
+    private let mainTextLabel: UILabel = {
+        let label = UILabel()
+        label.text = "000회 당첨결과"
+        label.font = .systemFont(ofSize: 23, weight: .bold)
+        label.textColor = .label
+        return label
+    }()
+    
+    private let lottoNumberStackView: UIStackView = {
+        
+        let stackView = UIStackView(arrangedSubviews: [
+            // 아래 숫자들은 초기 더미 데이터에 해당.
+            LottoNumberBall(number: 6),
+            LottoNumberBall(number: 14),
+            LottoNumberBall(number: 16),
+            LottoNumberBall(number: 21),
+            LottoNumberBall(number: 27),
+            LottoNumberBall(number: 37),
+            LottoNumberBall(string: "+"),
+            LottoNumberBall(number: 40),
+        ])
+        stackView.axis = .horizontal
+        stackView.alignment = .fill
+        stackView.spacing = 7
+        stackView.distribution = .fillEqually
+        return stackView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+        view.backgroundColor = .systemBackground
+        setupViewHierarchy()
+        setupLayoutConstraints()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        let lottoBallSideLength = lottoNumberStackView.frame.height
+        lottoNumberStackView.arrangedSubviews.forEach { lottoBall in
+            lottoBall.layer.cornerRadius = lottoBallSideLength/2
+            lottoBall.clipsToBounds = true
+        }
     }
-    */
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        setMainText(number: 913)
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        
+        view.endEditing(true)
+    }
+    
+}
 
+
+private extension LottoViewController {
+    
+    func setupDesign() {
+        
+    }
+    
+    func setupViewHierarchy() {
+        [
+            textField,
+            titleLabel,
+            dateLabel,
+            separator,
+            mainTextLabel,
+            lottoNumberStackView,
+        ].forEach { view.addSubview($0) }
+    }
+    
+    func setupLayoutConstraints() {
+        textField.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).inset(24)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(24)
+            make.height.equalTo(50)
+        }
+        
+        titleLabel.snp.makeConstraints { make in
+            make.leading.equalTo(view.safeAreaLayoutGuide).inset(24)
+            make.bottom.equalTo(separator.snp.top).offset(-12)
+        }
+        
+        dateLabel.snp.makeConstraints { make in
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(24)
+            make.bottom.equalTo(titleLabel.snp.bottom)
+        }
+        
+        separator.snp.makeConstraints { make in
+            make.top.equalTo(textField.snp.bottom).offset(80)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(24)
+            make.height.equalTo(1)
+        }
+        
+        mainTextLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(separator.snp.bottom).offset(40)
+        }
+        
+        lottoNumberStackView.snp.makeConstraints { make in
+            make.top.equalTo(mainTextLabel.snp.bottom).offset(30)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(24)
+        }
+        
+        lottoNumberStackView.arrangedSubviews.forEach { lottoBall in
+            lottoBall.snp.makeConstraints { make in
+                make.width.equalTo(lottoBall.snp.height)
+            }
+        }
+    }
+    
+    private func setMainText(number: Int) {
+        let justString = "\(number)회 당첨결과"
+        let attributedText = NSMutableAttributedString(string: justString)
+        guard let rangeToSetBlack = justString.range(of: "\(number)회") else { return }
+        attributedText.addAttributes(
+            [.foregroundColor: UIColor.systemYellow],
+            range: (justString as NSString).range(of: "\(number)회")
+        )
+        mainTextLabel.attributedText = attributedText
+    }
+    
 }

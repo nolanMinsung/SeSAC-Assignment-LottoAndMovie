@@ -8,12 +8,18 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
+    let lottoButton = UIButton()
+    let moviewButton = UIButton()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
+        view.addSubview(lottoButton)
+        view.addSubview(moviewButton)
+        
     }
-
-
+    
+    
 }
 

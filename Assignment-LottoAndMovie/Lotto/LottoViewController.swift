@@ -75,6 +75,7 @@ class LottoViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupViewHierarchy()
         setupLayoutConstraints()
+        setTextFieldInputView()
     }
     
     override func viewDidLayoutSubviews() {
@@ -102,11 +103,8 @@ class LottoViewController: UIViewController {
 }
 
 
+// Initial Settings
 private extension LottoViewController {
-    
-    func setupDesign() {
-        
-    }
     
     func setupViewHierarchy() {
         [
@@ -159,7 +157,15 @@ private extension LottoViewController {
         }
     }
     
-    private func setMainText(number: Int) {
+    func setTextFieldInputView() {
+        let pickerView = UIPickerView()
+        pickerView.dataSource = self
+        pickerView.delegate = self
+        
+        textField.inputView = pickerView
+    }
+    
+    func setMainText(number: Int) {
         let justString = "\(number)회 당첨결과"
         let attributedText = NSMutableAttributedString(string: justString)
         guard let rangeToSetBlack = justString.range(of: "\(number)회") else { return }
@@ -168,6 +174,51 @@ private extension LottoViewController {
             range: (justString as NSString).range(of: "\(number)회")
         )
         mainTextLabel.attributedText = attributedText
+    }
+    
+}
+
+
+extension LottoViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return 1181
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return "\(row + 1)"
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        let selectedNumber = row + 1
+        textField.text = "\(selectedNumber)"
+        setMainText(number: selectedNumber)
+        configureLottoBalls(numbers: makeRandomSixNumbers())
+    }
+    
+}
+
+
+private extension LottoViewController {
+    
+    func configureLottoBalls(numbers: [Int]) {
+        for i in 0..<7 {
+            let lottoBallIndex = i < 6 ? i : i + 1
+            guard let lottoBall = lottoNumberStackView.arrangedSubviews[lottoBallIndex] as? LottoNumberBall else { continue }
+            lottoBall.setNumber(numbers[i])
+        }
+    }
+    
+    func makeRandomSixNumbers() -> [Int] {
+        var numbers: Set<Int> = []
+        while numbers.count < 7 {
+            numbers.insert(Int.random(in: 1...45))
+        }
+        return Array(numbers).sorted()
     }
     
 }

@@ -202,6 +202,7 @@ extension LottoViewController: UIPickerViewDataSource, UIPickerViewDelegate {
             case .success(let lottoResultModel):
                 self?.configureLottoBalls(lottoResultModel)
             case .failure(let error):
+                self?.alert(message: "문제가 발생했네요.\n\(error.localizedDescription)")
                 assertionFailure(error.localizedDescription)
             }
         }

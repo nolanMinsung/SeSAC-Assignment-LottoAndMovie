@@ -210,16 +210,3 @@ extension MovieRankingViewController: UITextFieldDelegate {
     }
     
 }
-
-
-// 네트워크 통신
-extension MovieRankingViewController {
-    
-    func alert(message: String) {
-        let alertController = UIAlertController(title: "에러 발생", message: message, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "확인", style: .cancel)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true)
-    }
-    
-}

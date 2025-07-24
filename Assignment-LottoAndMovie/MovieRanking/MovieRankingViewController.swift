@@ -11,21 +11,30 @@ import SnapKit
 
 class MovieRankingViewController: UIViewController {
     
-    let searchTextField: UITextField = {
+    private let searchTextField: UITextField = {
         let textField = UITextField()
         textField.borderStyle = .none
         textField.font = .systemFont(ofSize: 18)
         textField.textColor = .white
+        textField.tintColor = .white
+        let placeholderAttributeContainer: AttributeContainer = .init(
+            [.foregroundColor: UIColor.lightGray]
+        )
+        let placeholderAttrStr = AttributedString(
+            "날짜 형식: yyyyMMdd",
+            attributes: placeholderAttributeContainer
+        )
+        textField.attributedPlaceholder = NSAttributedString(placeholderAttrStr)
         return textField
     }()
     
-    let textFieldUnderLine: UIView = {
+    private let textFieldUnderLine: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         return view
     }()
     
-    let searchButton: UIButton = {
+    private let searchButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("검색", for: .normal)
         button.setTitleColor(.black, for: .normal)
@@ -34,7 +43,7 @@ class MovieRankingViewController: UIViewController {
         return button
     }()
     
-    let tableView: UITableView = {
+    private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .clear
         tableView.allowsSelection = false
@@ -45,7 +54,26 @@ class MovieRankingViewController: UIViewController {
         return tableView
     }()
     
-    var movies: [MovieModel] = []
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = .white
+        indicator.isHidden = true
+        return indicator
+    }()
+    
+    private var movies: [MovieModel] = []
+    
+    private var isLoading: Bool = false {
+        didSet {
+            if isLoading {
+                activityIndicator.startAnimating()
+                tableView.isHidden = true
+            } else {
+                activityIndicator.stopAnimating()
+                tableView.isHidden = false
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,6 +98,7 @@ private extension MovieRankingViewController {
     }
     
     func setupViewHierarchy() {
+        view.addSubview(activityIndicator)
         view.addSubview(searchTextField)
         view.addSubview(textFieldUnderLine)
         view.addSubview(searchButton)
@@ -98,6 +127,9 @@ private extension MovieRankingViewController {
         tableView.snp.makeConstraints { make in
             make.top.equalTo(textFieldUnderLine.snp.bottom).offset(20)
             make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide).inset(10)
+        }
+        activityIndicator.snp.makeConstraints { make in
+            make.center.equalTo(tableView)
         }
     }
     
@@ -132,6 +164,7 @@ private extension MovieRankingViewController {
     /// 특정 날짜(Date)의 영화 순위 정보를 받아와 화면의 띄우는 함수.
     /// - Parameter date: 순위를 알고 싶은 날짜 정보.
     func updateMovieRankingData(date: Date = Date.now.addingTimeInterval(-3600 * 24)) {
+        isLoading = true
         fetchMovieRankingData(date: date) { [weak self] result in
             switch result {
             case .success(let fetchedMovieModels):
@@ -141,6 +174,7 @@ private extension MovieRankingViewController {
                 self?.alert(message: error.localizedDescription)
                 assertionFailure(error.localizedDescription)
             }
+            self?.isLoading = false
         }
     }
     

@@ -27,6 +27,8 @@ class MovieRankingTableViewCell: UITableViewCell {
         let label = UILabel()
         label.text = "엽문4: 더 파이널"
         label.textColor = .white
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.7
         label.font = .systemFont(ofSize: 15, weight: .bold)
         return label
     }()

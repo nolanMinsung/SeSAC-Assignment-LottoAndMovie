@@ -106,7 +106,7 @@ private extension MovieRankingViewController {
     }
     
     @objc func searchButtonTapped() {
-        updateMovieRankingData()
+        doSearch()
         view.endEditing(true)
     }
     
@@ -114,10 +114,25 @@ private extension MovieRankingViewController {
 
 
 // 뷰 업데이트 관련
-extension MovieRankingViewController {
+private extension MovieRankingViewController {
     
-    func updateMovieRankingData() {
-        fetchMovieRankingData { [weak self] result in
+    /// 검색창에 입력된 데이터를 바탕으로 영화 순위 검색.
+    func doSearch() {
+        let trimmedSearchText = searchTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd"
+        guard !trimmedSearchText.isEmpty else { return }
+        guard let date = dateFormatter.date(from: trimmedSearchText) else {
+            alert(message: "유효하지 않은 날짜 형식입니다.\n검색할 수가 업슴니다. \nyyyyMMdd 형식으로 검색 부탁드려요. 🙏")
+            return
+        }
+        updateMovieRankingData(date: date)
+    }
+    
+    /// 특정 날짜(Date)의 영화 순위 정보를 받아와 화면의 띄우는 함수.
+    /// - Parameter date: 순위를 알고 싶은 날짜 정보.
+    func updateMovieRankingData(date: Date = Date.now.addingTimeInterval(-3600 * 24)) {
+        fetchMovieRankingData(date: date) { [weak self] result in
             switch result {
             case .success(let fetchedMovieModels):
                 self?.movies = fetchedMovieModels
@@ -155,7 +170,7 @@ extension MovieRankingViewController: UITableViewDataSource {
 extension MovieRankingViewController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        updateMovieRankingData()
+        doSearch()
         searchTextField.resignFirstResponder()
         return true
     }
@@ -168,10 +183,10 @@ extension MovieRankingViewController {
     
     /// 영화 순위 정보를 비동기적으로 받아오는 함수. 영화 정보는 `MovieModel` 타입이다.
     /// - Parameters:
-    ///   - date: 영화 순위를 알고 싶은 날짜의 `Date` 인스턴스. 기본값으로 조회 시점보다 하루 전(어제)의 값이 들어감.
+    ///   - date: 영화 순위를 알고 싶은 날짜의 `Date` 인스턴스.
     ///   - completion: 콜백함수입니다~
     func fetchMovieRankingData(
-        date: Date = Date.now.addingTimeInterval(-3600 * 24),
+        date: Date,
         completion: @escaping (Result<[MovieModel], Error>) -> Void
     ) {
         MovieNetworkManager.shard.requestMovieRanking(date: date) { result in

@@ -9,7 +9,7 @@ import Foundation
 
 
 struct KOBISBoxOfficeDTO: Decodable {
-    let boxofficeResult: BoxOfficeResultDTO
+    let boxOfficeResult: BoxOfficeResultDTO
 }
 
 struct BoxOfficeResultDTO: Decodable {

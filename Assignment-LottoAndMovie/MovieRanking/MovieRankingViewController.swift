@@ -45,7 +45,7 @@ class MovieRankingViewController: UIViewController {
         return tableView
     }()
     
-    var movies: [Movie] = []
+    var movies: [MovieModel] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,7 +62,7 @@ class MovieRankingViewController: UIViewController {
 
 
 // Initial Settings
-extension MovieRankingViewController {
+private extension MovieRankingViewController {
     
     func setupDelegates() {
         tableView.dataSource = self
@@ -113,23 +113,30 @@ extension MovieRankingViewController {
 }
 
 
+// 뷰 업데이트 관련
 extension MovieRankingViewController {
     
     func updateMovieRankingData() {
-        var movieSet: Set<Movie> = []
-        while movieSet.count < 11 {
-            movieSet.insert(MovieInfo.movies.randomElement()!)
+        fetchMovieRankingData { [weak self] result in
+            switch result {
+            case .success(let fetchedMovieModels):
+                self?.movies = fetchedMovieModels
+                self?.tableView.reloadData()
+            case .failure(let error):
+                self?.alert(message: error.localizedDescription)
+                assertionFailure(error.localizedDescription)
+            }
         }
-        movies = Array(movieSet).sorted { $0.audienceCount < $1.audienceCount }
-        tableView.reloadData()
     }
     
 }
 
+
+// MARK: - UITableViewDataSource
 extension MovieRankingViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return movies.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -143,12 +150,46 @@ extension MovieRankingViewController: UITableViewDataSource {
     
 }
 
+
+// MARK: - UITextFieldDelegate
 extension MovieRankingViewController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         updateMovieRankingData()
         searchTextField.resignFirstResponder()
         return true
+    }
+    
+}
+
+
+// 네트워크 통신
+extension MovieRankingViewController {
+    
+    /// 영화 순위 정보를 비동기적으로 받아오는 함수. 영화 정보는 `MovieModel` 타입이다.
+    /// - Parameters:
+    ///   - date: 영화 순위를 알고 싶은 날짜의 `Date` 인스턴스. 기본값으로 조회 시점보다 하루 전(어제)의 값이 들어감.
+    ///   - completion: 콜백함수입니다~
+    func fetchMovieRankingData(
+        date: Date = Date.now.addingTimeInterval(-3600 * 24),
+        completion: @escaping (Result<[MovieModel], Error>) -> Void
+    ) {
+        MovieNetworkManager.shard.requestMovieRanking(date: date) { result in
+            switch result {
+            case .success(let movieModels):
+                completion(.success(movieModels))
+            case .failure(let error):
+                completion(.failure(error))
+                assertionFailure(error.localizedDescription)
+            }
+        }
+    }
+    
+    func alert(message: String) {
+        let alertController = UIAlertController(title: "에러 발생", message: message, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "확인", style: .cancel)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true)
     }
     
 }

@@ -78,6 +78,7 @@ private extension MovieRankingTableViewCell {
         }
         
         dateLabel.setContentHuggingPriority(.defaultHigh + 1, for: .horizontal)
+        dateLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
         dateLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.verticalEdges.trailing.equalToSuperview().inset(10)
@@ -90,18 +91,13 @@ private extension MovieRankingTableViewCell {
 
 extension MovieRankingTableViewCell {
     
-    func configure(with movie: Movie, ranking: Int) {
+    func configure(with movie: MovieModel, ranking: Int) {
         rankingNumberLabel.text = "\(ranking)"
-        movieNameLabel.text = movie.title
+        movieNameLabel.text = movie.movieName
         
-        var releaseDate = movie.releaseDate
-        let index1 = releaseDate.index(releaseDate.startIndex, offsetBy: 4)
-        let index2 = releaseDate.index(releaseDate.startIndex, offsetBy: 6)
-        
-        // index2부터 넣어야 함.
-        releaseDate.insert("-", at: index2)
-        releaseDate.insert("-", at: index1)
-        dateLabel.text = releaseDate
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        dateLabel.text = formatter.string(from: movie.openDate)
     }
     
 }

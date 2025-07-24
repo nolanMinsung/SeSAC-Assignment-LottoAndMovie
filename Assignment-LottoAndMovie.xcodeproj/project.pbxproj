@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4ED7B0BE2E310F24005A90CC /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4ED7B0BD2E310F24005A90CC /* SnapKit */; };
+		4ED7B1B12E320B74005A90CC /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 4ED7B1B02E320B74005A90CC /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4ED7B0BE2E310F24005A90CC /* SnapKit in Frameworks */,
+				4ED7B1B12E320B74005A90CC /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			name = "Assignment-LottoAndMovie";
 			packageProductDependencies = (
 				4ED7B0BD2E310F24005A90CC /* SnapKit */,
+				4ED7B1B02E320B74005A90CC /* Alamofire */,
 			);
 			productName = "Assignment-LottoAndMovie";
 			productReference = 4ED7B0A42E310E32005A90CC /* Assignment-LottoAndMovie.app */;
@@ -115,6 +118,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				4ED7B0BC2E310F24005A90CC /* XCRemoteSwiftPackageReference "SnapKit" */,
+				4ED7B1AF2E320B74005A90CC /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4ED7B0A52E310E32005A90CC /* Products */;
@@ -360,6 +364,14 @@
 				minimumVersion = 5.7.1;
 			};
 		};
+		4ED7B1AF2E320B74005A90CC /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.10.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -367,6 +379,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4ED7B0BC2E310F24005A90CC /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		4ED7B1B02E320B74005A90CC /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4ED7B1AF2E320B74005A90CC /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -39,6 +39,8 @@ class MovieRankingViewController: UIViewController {
         tableView.backgroundColor = .clear
         tableView.allowsSelection = false
         tableView.separatorStyle = .none
+        tableView.rowHeight = 45
+        tableView.keyboardDismissMode = .onDrag
         tableView.register(MovieRankingTableViewCell.self, forCellReuseIdentifier: "MovieRankingTableViewCell")
         return tableView
     }()
@@ -51,8 +53,9 @@ class MovieRankingViewController: UIViewController {
         view.backgroundColor = .black
         setupViewHierarchy()
         setupLayoutConstraints()
-        setupTableView()
-        updateMovieData()
+        setupDelegates()
+        setupActions()
+        updateMovieRankingData()
     }
     
 }
@@ -61,10 +64,9 @@ class MovieRankingViewController: UIViewController {
 // Initial Settings
 extension MovieRankingViewController {
     
-    func setupTableView() {
-        tableView.rowHeight = 45
+    func setupDelegates() {
         tableView.dataSource = self
-        tableView.delegate = self
+        searchTextField.delegate = self
     }
     
     func setupViewHierarchy() {
@@ -99,17 +101,27 @@ extension MovieRankingViewController {
         }
     }
     
+    func setupActions() {
+        searchButton.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc func searchButtonTapped() {
+        updateMovieRankingData()
+        view.endEditing(true)
+    }
+    
 }
 
 
 extension MovieRankingViewController {
     
-    func updateMovieData() {
+    func updateMovieRankingData() {
         var movieSet: Set<Movie> = []
         while movieSet.count < 11 {
             movieSet.insert(MovieInfo.movies.randomElement()!)
         }
         movies = Array(movieSet).sorted { $0.audienceCount < $1.audienceCount }
+        tableView.reloadData()
     }
     
 }
@@ -125,12 +137,18 @@ extension MovieRankingViewController: UITableViewDataSource {
             withIdentifier: MovieRankingTableViewCell.reuseIdentifier,
             for: indexPath
         ) as! MovieRankingTableViewCell
-        cell.configure(with: movies[indexPath.row], ranking: indexPath.row - 1)
+        cell.configure(with: movies[indexPath.row], ranking: indexPath.row + 1)
         return cell
     }
     
 }
 
-extension MovieRankingViewController: UITableViewDelegate {
+extension MovieRankingViewController: UITextFieldDelegate {
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        updateMovieRankingData()
+        searchTextField.resignFirstResponder()
+        return true
+    }
     
 }

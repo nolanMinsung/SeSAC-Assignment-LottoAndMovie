@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Movie {
+struct Movie: Hashable {
     let title: String
     let releaseDate: String
     let audienceCount: Int

@@ -91,7 +91,7 @@ class LottoViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        setMainText(number: 913)
+        setMainTextAttribute(number: 1181)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -165,10 +165,9 @@ private extension LottoViewController {
         textField.inputView = pickerView
     }
     
-    func setMainText(number: Int) {
+    func setMainTextAttribute(number: Int) {
         let justString = "\(number)회 당첨결과"
         let attributedText = NSMutableAttributedString(string: justString)
-        guard let rangeToSetBlack = justString.range(of: "\(number)회") else { return }
         attributedText.addAttributes(
             [.foregroundColor: UIColor.systemYellow],
             range: (justString as NSString).range(of: "\(number)회")
@@ -179,6 +178,7 @@ private extension LottoViewController {
 }
 
 
+// MARK: - UIPickerViewDataSource, UIPickerViewDelegate
 extension LottoViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -196,29 +196,31 @@ extension LottoViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let selectedNumber = row + 1
         textField.text = "\(selectedNumber)"
-        setMainText(number: selectedNumber)
-        configureLottoBalls(numbers: makeRandomSixNumbers())
+        setMainTextAttribute(number: selectedNumber)
+        LottoNetworkManager.shared.fetchLottoResult(drawNumber: selectedNumber) { [weak self] result in
+            switch result {
+            case .success(let lottoResultModel):
+                self?.configureLottoBalls(lottoResultModel)
+            case .failure(let error):
+                assertionFailure(error.localizedDescription)
+            }
+        }
     }
     
 }
 
 
-private extension LottoViewController {
+// 뷰 업데이트 관련
+extension LottoViewController {
     
-    func configureLottoBalls(numbers: [Int]) {
+    // view로 분리할 경우 view 자체의 메서드로 두는 것이 좋을 듯.
+    func configureLottoBalls(_ resultModel: LottoResultModel) {
+        let numbers = resultModel.numbers
         for i in 0..<7 {
             let lottoBallIndex = i < 6 ? i : i + 1
             guard let lottoBall = lottoNumberStackView.arrangedSubviews[lottoBallIndex] as? LottoNumberBall else { continue }
             lottoBall.setNumber(numbers[i])
         }
-    }
-    
-    func makeRandomSixNumbers() -> [Int] {
-        var numbers: Set<Int> = []
-        while numbers.count < 7 {
-            numbers.insert(Int.random(in: 1...45))
-        }
-        return Array(numbers).sorted()
     }
     
 }

@@ -165,7 +165,7 @@ private extension MovieRankingViewController {
     /// - Parameter date: 순위를 알고 싶은 날짜 정보.
     func updateMovieRankingData(date: Date = Date.now.addingTimeInterval(-3600 * 24)) {
         isLoading = true
-        fetchMovieRankingData(date: date) { [weak self] result in
+        MovieNetworkManager.shard.requestMovieRanking(date: date) { [weak self] result in
             switch result {
             case .success(let fetchedMovieModels):
                 self?.movies = fetchedMovieModels
@@ -214,25 +214,6 @@ extension MovieRankingViewController: UITextFieldDelegate {
 
 // 네트워크 통신
 extension MovieRankingViewController {
-    
-    /// 영화 순위 정보를 비동기적으로 받아오는 함수. 영화 정보는 `MovieModel` 타입이다.
-    /// - Parameters:
-    ///   - date: 영화 순위를 알고 싶은 날짜의 `Date` 인스턴스.
-    ///   - completion: 콜백함수입니다~
-    func fetchMovieRankingData(
-        date: Date,
-        completion: @escaping (Result<[MovieModel], Error>) -> Void
-    ) {
-        MovieNetworkManager.shard.requestMovieRanking(date: date) { result in
-            switch result {
-            case .success(let movieModels):
-                completion(.success(movieModels))
-            case .failure(let error):
-                completion(.failure(error))
-                assertionFailure(error.localizedDescription)
-            }
-        }
-    }
     
     func alert(message: String) {
         let alertController = UIAlertController(title: "에러 발생", message: message, preferredStyle: .alert)

@@ -10,21 +10,10 @@ import Foundation
 import Alamofire
 
 // 일일 박스오피스 API로 한정
-class MovieNetworkManager {
+final class MovieNetworkManager {
     
     static let shard = MovieNetworkManager()
     private init() { }
-    
-    enum MovieNetworkManagerError: LocalizedError {
-        case invalidURLFormat(urlString: String)
-        
-        var errorDescription: String? {
-            switch self {
-            case .invalidURLFormat(let urlString):
-                "URL 형식이 유효하지 않습니다.: \(urlString)"
-            }
-        }
-    }
     
     enum QueryParameter: String {
         case key
@@ -45,7 +34,7 @@ class MovieNetworkManager {
 
 extension MovieNetworkManager {
     
-    // 영화 정보를 가져와보자. F1 재밌다.
+    // 영화 정보를 가져와보자.
     func requestMovieRanking(
         date: Date,
         completion: @escaping (Result<[MovieModel], Error>) -> Void

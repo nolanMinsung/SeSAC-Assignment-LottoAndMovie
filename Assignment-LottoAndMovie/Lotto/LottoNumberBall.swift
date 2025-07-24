@@ -16,6 +16,8 @@ final class LottoNumberBall: UIView {
         label.textColor = .white
         label.font = .systemFont(ofSize: 20, weight: .bold)
         label.textAlignment = .center
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.5
         return label
     }()
     

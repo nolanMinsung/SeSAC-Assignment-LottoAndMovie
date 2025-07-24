@@ -15,8 +15,15 @@ class MovieNetworkManager {
     static let shard = MovieNetworkManager()
     private init() { }
     
-    enum MovieNetworkManagerError: Error {
-        case invalidURLFormat
+    enum MovieNetworkManagerError: LocalizedError {
+        case invalidURLFormat(urlString: String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .invalidURLFormat(let urlString):
+                "URL 형식이 유효하지 않습니다.: \(urlString)"
+            }
+        }
     }
     
     enum QueryParameter: String {
@@ -31,7 +38,7 @@ class MovieNetworkManager {
     /// - Note: 아래 값들은 `Github` 등에 공유되면 안 되는 민감한 정보일 수 있으므로,
     /// 실제로는 `.gitignore`에 추가된 `.xcconfig` 등에서 가져오는 것으로 구현
     let apiKey: String = "2150b2f3ee5962f8f030f0311f9eb787"
-    let baseUrlString = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
+    let baseUrlString = "https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
     
     func requestMovieRanking(
         date: Date,
@@ -79,7 +86,7 @@ extension MovieNetworkManager {
             urlString += parameterString
         }
         guard let url = URL(string: urlString) else {
-            throw MovieNetworkManagerError.invalidURLFormat
+            throw MovieNetworkManagerError.invalidURLFormat(urlString: urlString)
         }
         return url
     }

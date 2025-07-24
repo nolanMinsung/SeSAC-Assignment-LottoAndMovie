@@ -8,9 +8,18 @@
 import Foundation
 
 
-enum MovieModelError: Error {
+enum MovieModelError: LocalizedError {
     case rankNotInt
-    case dtoDateFormatError
+    case dtoDateFormatError(value: String)
+    
+    var errorDescription: String? {
+        switch self {
+        case .rankNotInt:
+            "DTO의 rank 정보가 정수가 아닌 다른 값입니다."
+        case .dtoDateFormatError(let dateInString):
+            "DTO의 openDt 속성의 값이 정해진 형식이 아닙니다.: \(dateInString)"
+        }
+    }
 }
 
 /// 랭킹에 신규 진입 여부를 나타내는 타입.
@@ -40,9 +49,9 @@ struct MovieModel: Decodable {
      */
     
     /// 영화명(국문)
-    let movieNm: String
+    let movieName: String
     /// 영화의 개봉일
-    let openDt: Date
+    let openDate: Date
     
     /*
     /// 해당일의 매출액
@@ -74,15 +83,15 @@ struct MovieModel: Decodable {
             throw MovieModelError.rankNotInt
         }
         self.rank = rank
-        self.movieNm = dto.movieNm
+        self.movieName = dto.movieNm
         
         let openDateFormat: String = "yyyy-MM-dd"
         let formatter = DateFormatter()
         formatter.dateFormat = openDateFormat
         guard let openDate = formatter.date(from: dto.openDt) else {
-            throw MovieModelError.dtoDateFormatError
+            throw MovieModelError.dtoDateFormatError(value: dto.openDt)
         }
-        self.openDt = openDate
+        self.openDate = openDate
     }
     
 }
